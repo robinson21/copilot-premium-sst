@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Implementación Copilot Premium × SST</title>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#242836;--accent:#6C5CE7;--accent2:#A29BFE;--green:#00B894;--orange:#FDCB6E;--red:#E17055;--blue:#74B9FF;--text:#E8E8ED;--text2:#9CA3AF;--border:#2D3140;--radius:12px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:20px;max-width:1000px;margin:0 auto}
+.hdr{text-align:center;padding:28px 0 18px}
+.hdr h1{font-size:1.9em;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+.hdr .sub{color:var(--text2);font-size:.92em}
+.hdr .tags{display:flex;justify-content:center;gap:8px;margin-top:12px;flex-wrap:wrap}
+.htag{background:var(--surface);border:1px solid var(--border);padding:4px 12px;border-radius:20px;font-size:.78em;color:var(--text2)}
+.htag b{color:var(--accent2)}
+.tabs{display:flex;gap:4px;overflow-x:auto;padding:4px;background:var(--surface);border-radius:var(--radius);margin:20px 0;border:1px solid var(--border)}
+.tab{flex:1;min-width:105px;padding:10px 6px;text-align:center;border-radius:8px;cursor:pointer;font-size:.8em;font-weight:600;color:var(--text2);transition:all .25s;border:none;background:transparent;white-space:nowrap}
+.tab:hover{background:var(--surface2);color:var(--text)}
+.tab.active{background:var(--accent);color:#fff;box-shadow:0 2px 12px #6C5CE744}
+.tab .ti{display:block;font-size:1.3em;margin-bottom:2px}
+.tc{display:none;animation:fi .3s ease}.tc.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:16px}
+.ct{font-size:1.1em;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.ct .ci{font-size:1.3em}
+.sl{counter-reset:s}
+.s{counter-increment:s;padding:16px 16px 16px 58px;position:relative;margin-bottom:12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;border-left:3px solid var(--accent)}
+.s::before{content:counter(s);position:absolute;left:14px;top:14px;width:30px;height:30px;background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85em;font-weight:700}
+.s h4{font-size:.95em;margin-bottom:6px;color:var(--accent2)}
+.s p{font-size:.88em;color:var(--text2);line-height:1.6}
+.hl{color:var(--green);font-weight:600}
+.wn{color:var(--orange);font-weight:600}
+.act{display:inline-block;background:var(--accent);color:#fff;padding:3px 10px;border-radius:6px;font-size:.78em;font-weight:600;margin-top:4px}
+.pb{background:#13151d;border:1px solid var(--border);border-radius:8px;padding:16px;margin:10px 0;position:relative;font-family:'Cascadia Code','Fira Code',monospace;font-size:.82em;line-height:1.8;white-space:pre-wrap;word-break:break-word;max-height:360px;overflow-y:auto}
+.pb .v{color:var(--orange);font-weight:600}
+.pb .cm{color:var(--text2);font-style:italic}
+.cb{position:sticky;top:0;float:right;background:var(--accent);color:#fff;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:.75em;font-weight:600;transition:all .2s;z-index:2}
+.cb:hover{background:var(--accent2);transform:scale(1.05)}
+.cb.copied{background:var(--green)}
+.tb{background:#6C5CE710;border-left:3px solid var(--accent);padding:12px 16px;border-radius:0 8px 8px 0;margin:12px 0;font-size:.86em}
+.tb b{color:var(--accent2)}
+.wb{background:#E1705510;border-left:3px solid var(--red);padding:12px 16px;border-radius:0 8px 8px 0;margin:12px 0;font-size:.86em}
+.wb b{color:var(--red)}
+.gb{background:#00B89410;border-left:3px solid var(--green);padding:12px 16px;border-radius:0 8px 8px 0;margin:12px 0;font-size:.86em}
+.gb b{color:var(--green)}
+.bdg{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.73em;font-weight:600;margin:2px}
+.bw{background:#2B579A22;color:#5B9BD5;border:1px solid #2B579A44}
+.be{background:#21734622;color:#4CAF50;border:1px solid #21734644}
+.bo{background:#0078D422;color:#42A5F5;border:1px solid #0078D444}
+.bt{background:#6264A722;color:#9FA8DA;border:1px solid #6264A744}
+.bp{background:#D2472522;color:#FF7043;border:1px solid #D2472544}
+.rg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
+.rc{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+.rc .ri{font-size:1.5em;margin-bottom:4px}
+.rc b{display:block;font-size:.85em;color:var(--accent2)}
+.rc span{font-size:.78em;color:var(--text2)}
+.tl{display:flex;gap:0;margin:16px 0;align-items:stretch}
+.ts{flex:1;text-align:center;position:relative;padding:12px 6px;background:var(--surface2);border:1px solid var(--border)}
+.ts:first-child{border-radius:8px 0 0 8px}
+.ts:last-child{border-radius:0 8px 8px 0}
+.ts .tn{font-size:1.4em;font-weight:800;color:var(--accent)}
+.ts .tla{font-size:.75em;color:var(--text2);margin-top:2px}
+.ts .tt{font-size:.7em;color:var(--green);font-weight:600}
+.ctbl{width:100%;border-collapse:collapse;font-size:.84em;margin:12px 0}
+.ctbl th{background:var(--accent);color:#fff;padding:8px 10px;text-align:left;font-weight:600}
+.ctbl td{padding:8px 10px;border-bottom:1px solid var(--border)}
+.ctbl tr:hover td{background:var(--surface2)}
+.ctbl .y{color:var(--green);font-weight:700}
+.ctbl .n{color:var(--text2)}
+.ctbl .p{color:var(--orange);font-weight:600}
+.ft{text-align:center;color:var(--text2);font-size:.76em;margin-top:30px;padding:20px 0;border-top:1px solid var(--border)}
+@media(max-width:640px){body{padding:12px}.s{padding:14px 14px 14px 50px}.tabs{flex-wrap:nowrap}.tab{min-width:80px;font-size:.75em}.tl{flex-direction:column}.ts:first-child,.ts:last-child{border-radius:8px}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+<h1>🤖 Implementación Copilot Premium × SST</h1>
+<p class="sub">Paso a paso para cada proceso — Sin Copilot Studio, solo M365</p>
+<div class="tags">
+<span class="htag"><b>Licencia:</b> Copilot Premium (M365)</span>
+<span class="htag"><b>Apps:</b> Word · Excel · Outlook · Teams · Loop</span>
+<span class="htag"><b>Enfoque:</b> Universal — cualquier industria</span>
+</div>
+</div>
+<div class="tabs">
+<button class="tab active" onclick="sw('t0')"><span class="ti">🏠</span>Inicio</button>
+<button class="tab" onclick="sw('t1')"><span class="ti">🗺️</span>Mapa R.</button>
+<button class="tab" onclick="sw('t2')"><span class="ti">📋</span>IPERC</button>
+<button class="tab" onclick="sw('t3')"><span class="ti">✅</span>Pre-Uso</button>
+<button class="tab" onclick="sw('t4')"><span class="ti">🔍</span>Inspecc.</button>
+<button class="tab" onclick="sw('t5')"><span class="ti">📝</span>Proced.</button>
+<button class="tab" onclick="sw('t6')"><span class="ti">📊</span>PASST</button>
+<button class="tab" onclick="sw('t7')"><span class="ti">🏗️</span>Contra.</button>
+<button class="tab" onclick="sw('t8')"><span class="ti">🔄</span>Flujos</button>
+</div>
+
+<div class="tc active" id="t0">
+<div class="card">
+<div class="ct"><span class="ci">🎯</span> Capacidades de Copilot Premium por app</div>
+<table class="ctbl">
+<tr><th>Capacidad</th><th>Word</th><th>Excel</th><th>Outlook</th><th>Teams</th><th>Loop</th></tr>
+<tr><td>Generar documentos</td><td class="y">✅</td><td class="p">⚡</td><td class="n">—</td><td class="n">—</td><td class="y">✅</td></tr>
+<tr><td>Analizar/reescribir texto</td><td class="y">✅</td><td class="n">—</td><td class="y">✅</td><td class="y">✅</td><td class="y">✅</td></tr>
+<tr><td>Analizar imágenes</td><td class="y">✅</td><td class="p">⚡</td><td class="y">✅</td><td class="y">✅</td><td class="p">⚡</td></tr>
+<tr><td>Fórmulas y tablas</td><td class="p">⚡</td><td class="y">✅</td><td class="n">—</td><td class="n">—</td><td class="p">⚡</td></tr>
+<tr><td>Redactar correos</td><td class="n">—</td><td class="n">—</td><td class="y">✅</td><td class="n">—</td><td class="n">—</td></tr>
+<tr><td>Resumir reuniones</td><td class="n">—</td><td class="n">—</td><td class="p">⚡</td><td class="y">✅</td><td class="y">✅</td></tr>
+<tr><td>Analizar adjuntos</td><td class="y">✅</td><td class="y">✅</td><td class="y">✅</td><td class="y">✅</td><td class="p">⚡</td></tr>
+<tr><td>Formato condicional</td><td class="p">⚡</td><td class="y">✅</td><td class="n">—</td><td class="n">—</td><td class="n">—</td></tr>
+</table>
+<p style="font-size:.78em;color:var(--text2)">✅ Completo · ⚡ Parcial · — No disponible</p>
+</div>
+<div class="card">
+<div class="ct"><span class="ci">⏱️</span> Ruta de implementación sugerida</div>
+<div class="tl">
+<div class="ts"><div class="tn">1</div><div class="tla">Pre-Uso</div><div class="tt">Sem 1</div></div>
+<div class="ts"><div class="tn">2</div><div class="tla">IPERC</div><div class="tt">Sem 2</div></div>
+<div class="ts"><div class="tn">3</div><div class="tla">Inspecc.</div><div class="tt">Sem 3</div></div>
+<div class="ts"><div class="tn">4</div><div class="tla">Proced.</div><div class="tt">Sem 4</div></div>
+<div class="ts"><div class="tn">5</div><div class="tla">Mapa R.</div><div class="tt">Sem 5</div></div>
+<div class="ts"><div class="tn">6</div><div class="tla">PASST</div><div class="tt">Sem 6</div></div>
+<div class="ts"><div class="tn">7</div><div class="tla">Contra.</div><div class="tt">Sem 7</div></div>
+</div>
+<div class="tb"><b>💡 Empieza por Pre-Uso (checklists)</b> — mayor ahorro (~85%) y menor complejidad. Te familiarizas con Copilot y validas resultados rápido.</div>
+</div>
+<div class="card">
+<div class="ct"><span class="ci">🔑</span> Checklist previo</div>
+<div class="sl">
+<div class="s"><h4>Verificar licencia Copilot</h4><p>En Word/Excel busca el ícono <span class="hl">✨ Copilot</span> en la cinta superior derecha. Si no lo ves, contacta al admin de M365.</p></div>
+<div class="s"><h4>Crear carpeta en OneDrive/SharePoint</h4><p>Estructura: <span class="hl">SST/01-MapaRiesgos</span> · <span class="hl">SST/02-IPERC</span> · <span class="hl">SST/03-PreUso</span> · etc. Copilot funciona mejor con archivos en la nube M365.</p></div>
+<div class="s"><h4>Preparar archivos de referencia</h4><p>Sube a SharePoint: normativa vigente en PDF, plantillas actuales, IPERC anterior, reglamento interno.</p></div>
+<div class="s"><h4>Definir tu ficha base</h4><p>Tendrás datos que reutilizas en todos los prompts. Cópiala en OneNote o Loop.</p></div>
+</div>
+</div>
+<div class="card">
+<div class="ct"><span class="ci">📋</span> Tu ficha base (copia y completa)</div>
+<div class="pb" id="pficha"><button class="cb" onclick="cp('pficha')">📋 Copiar</button>EMPRESA: [Tu empresa]
+INDUSTRIA: [Rubro: minería, alimentos, construcción, etc.]
+PAÍS: [País]
+TRABAJADORES: [Número aprox.]
+ÁREAS: [Lista: producción, bodega, oficinas, etc.]
+NORMATIVA SST: [Normas principales del país]
+SEGURO SST: [Mutualidad/Aseguradora]
+RESPONSABLE SST: [Nombre]</div>
+<div class="tb"><b>Tip:</b> Guarda esta ficha en OneNote o Loop. Pégala al inicio de cada prompt para dar contexto.</div>
+</div>
+</div>
+
+<!-- T1: MAPA DE RIESGOS -->
+<div class="tc" id="t1">
+<div class="card">
+<div class="ct"><span class="ci">🗺️</span> 1. Mapa de Riesgos — Paso a paso</div>
+<p style="font-size:.88em;color:var(--text2);margin-bottom:12px">Zonificación de riesgos por área física</p>
+<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px"><span class="bdg bw">Word</span><span class="bdg be">Excel</span><span class="bdg bp">PowerPoint</span></div>
+</div>
+<div class="sl">
+<div class="s"><h4>Abrir Word con Copilot</h4><p><span class="act">Word → Nuevo documento → ✨ Copilot</span></p><p>Selecciona <span class="hl">"Redactar con Copilot"</span> en el panel derecho.</p></div>
+<div class="s"><h4>Adjuntar plano o layout (si tienes)</h4><p>Arrastra el plano (imagen/PDF) al chat con <span class="hl">📎+</span>. Copilot analizará la distribución para zonificar.</p><p><span class="wn">Si no tienes plano, describe las áreas en el prompt.</span></p></div>
+<div class="s"><h4>Pegar el prompt completo</h4>
+<div class="pb" id="p1"><button class="cb" onclick="cp('p1')">📋 Copiar</button>Actúa como especialista en seguridad y salud ocupacional con experiencia en mapas de riesgos.
+
+CONTEXTO:
+EMPRESA: [Nombre] | INDUSTRIA: [Rubro] | PAÍS: [País]
+TRABAJADORES: [Número] | TURNOS: [Mañana/Tarde/Noche]
+ÁREAS: [Listar áreas físicas de la instalación]
+NORMATIVA: [Normas del país aplicables]
+# Si adjuntaste plano, agregar:
+Analiza el plano adjunto para identificar zonas de riesgo según la distribución física.
+
+GENERA:
+1. Tabla de zonificación: Área | Peligros | Nivel riesgo (Crítico/Alto/Medio/Bajo) | Color semáforo | Personal expuesto | Controles existentes | Controles faltantes
+2. Listado de zonas críticas que requieren intervención inmediata
+3. Recomendaciones de señalización por zona según normativa aplicable
+4. Resumen ejecutivo al inicio del documento
+
+FORMATO: Tabla con código de colores. Documento profesional listo para el comité de SST.</div></div>
+<div class="s"><h4>Revisar y ajustar</h4><p>✅ ¿Todas las áreas están incluidas?<br>✅ ¿Los niveles son consistentes con tu IPERC?<br>✅ ¿Las normas son correctas para tu país?</p><p>Si algo no cuadra: <span class="hl">"El área de [X] debería ser nivel [Alto/Medio] porque [razón]"</span></p></div>
+<div class="s"><h4>Guardar como plantilla</h4><p><span class="act">Archivo → Guardar como → SharePoint/SST/01-MapaRiesgos</span></p><p>Nombra: <span class="hl">"Plantilla_Mapa_Riesgos_[Empresa].docx"</span></p></div>
+<div class="s"><h4>Versión PPT (opcional)</h4><p><span class="hl">Copilot → "Convierte este documento en una presentación de 5 diapositivas con el resumen ejecutivo del mapa de riesgos"</span></p></div>
+</div>
+<div class="gb"><b>✅ Resultado:</b> Word con zonificación + zonas críticas + plan señalización. ~15 min vs. ~3-4 horas manual.</div>
+<div class="rg">
+<div class="rc"><div class="ri">📄</div><b>Tabla zonificación</b><span>Word con colores</span></div>
+<div class="rc"><div class="ri">🔴</div><b>Zonas críticas</b><span>Priorizadas</span></div>
+<div class="rc"><div class="ri">🪧</div><b>Señalización</b><span>Por área</span></div>
+<div class="rc"><div class="ri">📊</div><b>PPT ejecutivo</b><span>5 slides</span></div>
+</div>
+</div>
+
+<!-- T2: IPERC -->
+<div class="tc" id="t2">
+<div class="card">
+<div class="ct"><span class="ci">📋</span> 2. Matriz IPERC — Paso a paso</div>
+<p style="font-size:.88em;color:var(--text2);margin-bottom:12px">Identificación de peligros, evaluación y control de riesgos</p>
+<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px"><span class="bdg be">Excel</span><span class="bdg bw">Word</span></div>
+</div>
+<div class="sl">
+<div class="s"><h4>Abrir Excel con Copilot</h4><p><span class="act">Excel → Nuevo libro → ✨ Copilot</span></p><p>Selecciona <span class="hl">"Redactar"</span> o <span class="hl">"Análisis"</span>.</p></div>
+<div class="s"><h4>Pegar el prompt</h4>
+<div class="pb" id="p2"><button class="cb" onclick="cp('p2')">📋 Copiar</button>Actúa como experto en IPERC con conocimiento en [NORMATIVA DEL PAÍS].
+
+CONTEXTO:
+EMPRESA: [Nombre] | INDUSTRIA: [Rubro] | PAÍS: [País]
+ACTIVIDADES: [Listar: operación, mantenimiento, logística, etc.]
+PUESTOS: [Listar: operador, técnico, supervisor, etc.]
+SUSTANCIAS PELIGROSAS: [Si aplica: químicos, gases, combustibles]
+METODOLOGÍA: Matriz [3x3 / 4x4 / 5x5] — Probabilidad × Severidad
+
+GENERA una tabla IPERC con estas columnas:
+N° | Área/Proceso | Puesto | Actividad | Tarea | Peligro | Riesgo | Tipo riesgo (Fís/Quím/Biol/Mec/Eléc/Psic/Erg) | Probabilidad (A/M/B) | Severidad (A/M/B) | Nivel riesgo | Valoración (Trivial/Tolerable/Moderado/Importante/Intolerable) | Controles — Jerarquía (Eliminación→Sustitución→Ingeniería→Administrativo→EPP) | Norma aplicable | Responsable | Fecha revisión
+
+REGLAS:
+- Mínimo 2 controles por riesgo (nunca solo EPP)
+- Referenciar norma específica en cada control
+- Fila resumen al final: totales por nivel y % por tipo
+- Formato condicional: rojo=intolerable, naranja=importante, amarillo=moderado, verde=tolerable, gris=trivial</div></div>
+<div class="s"><h4>Convertir en tabla oficial</h4><p><span class="hl">"Convierte este rango en tabla oficial de Excel con filtros y formato condicional por nivel de riesgo"</span></p></div>
+<div class="s"><h4>Agregar validación de datos</h4><p><span class="hl">"Agrega validación de datos tipo lista desplegable en Probabilidad y Severidad: Alta, Media, Baja"</span></p></div>
+<div class="s"><h4>Comparar con IPERC anterior (si existe)</h4><p>Adjúntala: <span class="hl">"Compara esta IPERC con la anterior. Identifica riesgos nuevos, eliminados y cambios de nivel."</span></p></div>
+<div class="s"><h4>Guardar y versionar</h4><p><span class="act">Archivo → Guardar como → SharePoint/SST/02-IPERC</span></p><p>Nombra: <span class="hl">"IPERC_[Empresa]_v[Fecha].xlsx"</span>. Mantén versión anterior en <span class="hl">/historial</span>.</p></div>
+</div>
+<div class="gb"><b>✅ Resultado:</b> Excel con IPERC completa, filtros, formato condicional y listas desplegables. ~20 min vs. ~2-3 días manual.</div>
+<div class="rg">
+<div class="rc"><div class="ri">📋</div><b>Matriz IPERC</b><span>Excel con filtros</span></div>
+<div class="rc"><div class="ri">🎨</div><b>Formato condicional</b><span>Semáforo auto</span></div>
+<div class="rc"><div class="ri">📊</div><b>Resumen estadístico</b><span>% por nivel/tipo</span></div>
+<div class="rc"><div class="ri">🔄</div><b>Comparativa</b><span>vs. IPERC anterior</span></div>
+</div>
+</div>
+
+<!-- T3: PRE-USO -->
+<div class="tc" id="t3">
+<div class="card">
+<div class="ct"><span class="ci">✅</span> 3. Checklists Pre-Uso — Paso a paso</div>
+<p style="font-size:.88em;color:var(--text2);margin-bottom:12px">Inspección pre-operacional de equipos y vehículos</p>
+<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px"><span class="bdg bw">Word</span><span class="bdg be">Excel</span><span class="bdg bt">Teams</span></div>
+</div>
+<div class="sl">
+<div class="s"><h4>Abrir Word con Copilot</h4><p><span class="act">Word → Nuevo documento → ✨ Copilot → "Redactar"</span></p></div>
+<div class="s"><h4>Pegar el prompt</h4>
+<div class="pb" id="p3"><button class="cb" onclick="cp('p3')">📋 Copiar</button>Actúa como inspector de seguridad certificado con experiencia en inspecciones pre-uso según [NORMATIVA: ej. protocolo SUSESO, manufacturer specs, DS 44/2024].
+
+GENERA un checklist de inspección pre-uso para:
+EQUIPO: [Tipo de equipo/vehículo]
+MARCA/MODELO: [Si conoce, sino "Genérico"]
+CONTEXTO: [Industria: faena, planta, obra, transporte, etc.]
+
+ESTRUCTURA:
+A. DATOS GENERALES — Fecha | Hora | Inspector | Turno | Equipo N° | Horómetro/Km
+B. ÍTEMS POR SISTEMA (agregar/quitar según equipo):
+   1. Estructural: grietas, deformaciones, soldaduras, corrosión
+   2. Eléctrico: cableado, conexiones, protecciones, puesta a tierra
+   3. Hidráulico/Neumático: mangueras, cilindros, fugas, presiones
+   4. Mecánico: motor, transmisión, frenos, dirección
+   5. Seguridad: paradas emergencia, guardas, alarmas, extintor
+   6. EPP operador: casco, guantes, lentes, calzado, arnés
+   7. Documentación: licencia, seguro, certificado revisión
+
+C. CADA ÍTEM: N° | Componente | Criterio aceptación | Estado (✅OK / ⚠️Obs / ❌No conforme) | Observación
+
+D. RESULTADO:
+   [ ] APTO para operación
+   [ ] APTO CON OBSERVACIONES (detallar)
+   [ ] NO APTO — Bloquear hasta reparación
+
+E. FIRMAS: Operador ________ Supervisor ________ Próxima inspección: ________
+
+FORMATO: Tabla lista para imprimir o móvil. Una página por equipo.</div></div>
+<div class="s"><h4>Generar para múltiples equipos</h4><p><span class="hl">"Genera un checklist pre-uso para cada uno de estos equipos: [lista]. Sección separada por equipo."</span></p></div>
+<div class="s"><h4>Convertir en formulario digital (opcional)</h4><p><span class="act">Copilot → "Convierte este checklist en formato con casillas de verificación para llenado digital"</span></p><p>O mejor: copia a <span class="hl">Microsoft Forms</span> o <span class="hl">Lists</span> para recolección móvil.</p></div>
+<div class="s"><h4>Publicar en Teams</h4><p>Guarda en <span class="hl">SharePoint/SST/03-PreUso</span>. Comparte el link en el canal de SST.</p></div>
+</div>
+<div class="gb"><b>✅ Resultado:</b> Checklist profesional por equipo. ~5 min vs. ~1-2 horas manual por equipo.</div>
+<div class="rg">
+<div class="rc"><div class="ri">✅</div><b>Checklist completo</b><span>Por equipo</span></div>
+<div class="rc"><div class="ri">📱</div><b>Formato móvil</b><span>Digital o impres</span></div>
+<div class="rc"><div class="ri">🔵</div><b>Formulario</b><span>Forms / Lists</span></div>
+<div class="rc"><div class="ri">💬</div><b>En Teams</b><span>Acceso campo</span></div>
+</div>
+</div>
+
+<!-- T4: INSPECCIONES -->
+<div class="tc" id="t4">
+<div class="card">
+<div class="ct"><span class="ci">🔍</span> 4. Inspecciones Campo → Informe — Paso a paso</div>
+<p style="font-size:.88em;color:var(--text2);margin-bottom:12px">De notas desordenadas a informe profesional con causa raíz</p>
+<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px"><span class="bdg bw">Word</span><span class="bdg bo">Outlook</span><span class="bdg bt">Teams</span></div>
+</div>
+<div class="sl">
+<div class="s"><h4>Recolectar datos en campo</h4><p>Toma notas como te sea más fácil:</p><p>📝 Notas sueltas en el celular<br>🎙️ Grabación de voz → Copilot transcribe<br>📷 Fotos de los hallazgos<br>💬 Mensajes de WhatsApp del equipo</p><p><span class="wn">No pierdas tiempo ordenando — Copilot hace ese trabajo.</span></p></div>
+<div class="s"><h4>Abrir Word con Copilot</h4><p><span class="act">Word → Nuevo documento → ✨ Copilot</span></p><p>Si tienes fotos, adjúntalas con <span class="hl">📎+</span> antes del prompt.</p></div>
+<div class="s"><h4>Pegar el prompt + notas</h4>
+<div class="pb" id="p4"><button class="cb" onclick="cp('p4')">📋 Copiar</button>Actúa como inspector de seguridad senior. Transforma las siguientes notas de campo en un informe profesional.
+
+DATOS:
+EMPRESA: [Nombre] | ÁREA: [Área inspeccionada]
+FECHA: [Fecha] | INSPECTOR: [Tu nombre]
+NORMATIVA: [Normas del país]
+
+NOTAS DE CAMPO (pegar directamente, sin ordenar):
+[PEGAR AQUÍ: observaciones sueltas, puntos, voice-to-text, descripciones de fotos — NO necesita estar ordenado]
+
+ESTRUCTURA DEL INFORME:
+1. RESUMEN EJECUTIVO — hallazgos totales por categoría (crítico/mayor/menor/observación), tendencia
+2. HALLAZGOS DETALLADOS — cada uno con: Código (H-001...) | Ubicación | Descripción profesional | Clasificación | Norma incumplida (artículo específico) | 5 Porqués (causa raíz) | Acción correctiva + responsable + plazo | Ref. foto
+3. PLAN DE ACCIONES CORRECTIVAS — Tabla: N° | Hallazgo | Acción | Responsable | Plazo | Estado | Verificación
+4. CONCLUSIONES — patrones observados, áreas prioritarias, fecha próxima inspección
+
+TONO: Profesional, objetivo, basado en evidencia.</div></div>
+<div class="s"><h4>Revisar causa raíz (5 Porqués)</h4><p><span class="wn">Revisa especialmente esta parte</span> — el modelo puede asumir causas que no corresponden. Valida con el equipo de campo.</p></div>
+<div class="s"><h4>Enviar correos de seguimiento (Outlook)</h4><p>Outlook → <span class="hl">✨ Copilot → "Redacta un correo al responsable de [área] solicitando implementar las acciones correctivas del informe adjunto. Plazos de 5 días hábiles."</span></p></div>
+<div class="s"><h4>Compartir en Teams</h4><p>En el canal de SST: resumir en 5 viñetas · crear tareas en Planner · notificar a responsables.</p></div>
+</div>
+<div class="gb"><b>✅ Resultado:</b> Informe completo con 5 Porqués y plan de acciones. ~15 min vs. ~2-3 horas manual.</div>
+<div class="rg">
+<div class="rc"><div class="ri">📄</div><b>Informe profesional</b><span>Con estructura</span></div>
+<div class="rc"><div class="ri">🔬</div><b>5 Porqués</b><span>Causa raíz</span></div>
+<div class="rc"><div class="ri">📧</div><b>Correo Outlook</b><span>Seguimiento</span></div>
+<div class="rc"><div class="ri">💬</div><b>Tareas Teams</b><span>Planner</span></div>
+</div>
+</div>
+
+<!-- T5: PROCEDIMIENTOS -->
+<div class="tc" id="t5">
+<div class="card">
+<div class="ct"><span class="ci">📝</span> 5. Procedimientos de Trabajo Seguro (PTS) — Paso a paso</div>
+<p style="font-size:.88em;color:var(--text2);margin-bottom:12px">De una tarea a un procedimiento completo con RACI y análisis de riesgos</p>
+<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px"><span class="bdg bw">Word</span></div>
+</div>
+<div class="sl">
+<div class="s"><h4>Abrir Word con Copilot</h4><p><span class="act">Word → Nuevo documento → ✨ Copilot → "Redactar"</span></p></div>
+<div class="s"><h4>Adjuntar normativa como referencia</h4><p>Si tienes la norma en PDF, adjúntala con <span class="hl">📎+</span>. Copilot referenciará artículos específicos.</p></div>
+<div class="s"><h4>Pegar el prompt</h4>
+<div class="pb" id="p5"><button class="cb" onclick="cp('p5')">📋 Copiar</button>Actúa como profesional de SST con experiencia en redacción de Procedimientos de Trabajo Seguro según [NORMATIVA DEL PAÍS] y alineado con ISO 45001:2018.
+
+GENERA un PTS para:
+TAREA: [Describir: ej. "cambio de filtros", "trabajo en caliente - soldadura", "carga/descarga de camiones tanque"]
+EMPRESA: [Nombre] | ÁREA: [Área donde se ejecuta]
+
+ESTRUCTURA OBLIGATORIA:
+1. OBJETO — propósito del procedimiento
+2. ALCANCE — dónde aplica, qué incluye y excluye
+3. REFERENCIAS NORMATIVAS — normas legales y técnicas aplicables
+4. DEFINICIONES — términos clave
+5. RESPONSABILIDADES (matriz RACI):
+   Operador (R) | Supervisor SST (A) | Jefe de Área (C) | Gerente (I)
+6. RECURSOS NECESARIOS — EPP, herramientas, permisos, certificaciones
+7. DESARROLLO — paso a paso:
+   ANTES: permisos, verificaciones, EPP, condiciones ambientales
+   DURANTE: pasos numerados (verbo imperativo), puntos de decisión, alertas
+   DESPUÉS: verificación cierre, limpieza, reporte novedades
+8. ANÁLISIS DE RIESGOS — Tabla: Paso | Peligro | Riesgo | Control | Responsable
+9. PLAN DE EMERGENCIA — si falla el control principal
+10. ANEXOS — formatos, diagramas, croquis
+
+ESTILO: Tercera persona, voz activa, pasos imperativos. Máximo 4 páginas.</div></div>
+<div class="s"><h4>Revisar y ajustar pasos</h4><p>✅ ¿Los pasos siguen la secuencia real de la tarea?<br>✅ ¿El RACI refleja la estructura real?<br>✅ ¿Los permisos requeridos son correctos?</p><p>Para ajustar: <span class="hl">"El paso 3 debe incluir verificación de [permiso específico] antes de continuar"</span></p></div>
+<div class="s"><h4>Generar PTS para múltiples tareas</h4><p><span class="hl">"Ahora genera un PTS para [siguiente tarea] usando la misma estructura y formato del procedimiento anterior"</span></p><p>Copilot mantiene el contexto del formato.</p></div>
+<div class="s"><h4>Guardar en SharePoint</h4><p><span class="act">Archivo → Guardar como → SharePoint/SST/05-Procedimientos</span></p><p>Nombra: <span class="hl">"PTS_[Tarea]_v[Fecha].docx"</span></p></div>
+</div>
+<div class="gb"><b>✅ Resultado:</b> PTS completo con RACI, análisis de riesgos por paso y plan de emergencia. ~20 min vs. ~4-6 horas manual.</div>
+<div class="rg">
+<div class="rc"><div class="ri">📝</div><b>PTS completo</b><span>10 secciones</span></div>
+<div class="rc"><div class="ri">👤</div><b>Matriz RACI</b><span>4 roles</span></div>
+<div class="rc"><div class="ri">⚠️</div><b>Riesgos por paso</b><span>Con controles</span></div>
+<div class="rc"><div class="ri">🆘</div><b>Plan emergencia</b><span>Contingencia</span></div>
+</div>
+</div>
+
+<!-- T6: PASST -->
+<div class="tc" id="t6">
+<div class="card">
+<div class="ct"><span class="ci">📊</span> 6. Seguimiento PASST — Paso a paso</div>
+<p style="font-size:.88em;color:var(--text2);margin-bottom:12px">Programa Anual de SST — KPIs, brechas y alertas</p>
+<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px"><span class="bdg be">Excel</span><span class="bdg bt">Teams</span><span class="bdg bp">PowerPoint</span></div>
+</div>
+<div class="sl">
+<div class="s"><h4>Preparar los datos</h4><p>Necesitas: cronograma anual con avances · fechas de cumplimiento · resultados de auditorías previas.</p><p><span class="wn">Si tu PASST está en Excel, ábrelo directamente desde OneDrive/SharePoint.</span></p></div>
+<div class="s"><h4>Abrir Excel con Copilot</h4><p><span class="act">Excel → Abrir archivo PASST → ✨ Copilot</span></p></div>
+<div class="s"><h4>Pegar el prompt de análisis</h4>
+<div class="pb" id="p6"><button class="cb" onclick="cp('p6')">📋 Copiar</button>Actúa como gerente de SST analizando el PASST de [EMPRESA], año [AÑO].
+
+Analiza el archivo de PASST adjunto y genera:
+
+1. DASHBOARD EJECUTIVO
+   - % cumplimiento global del PASST
+   - % por eje estratégico (capacitación, inspecciones, normativo, emergencias, salud ocupacional)
+   - Actividades: cumplidas vs. programadas vs. atrasadas
+
+2. ANÁLISIS DE BRECHAS
+   - Actividades atrasadas con impacto en cumplimiento legal
+   - Responsables con más pendientes
+   - Áreas críticas que ponen en riesgo la auditoría/certificación
+
+3. ALERTAS Y VENCIMIENTOS
+   - Actividades que vencen en los próximos [N] días
+   - Permisos/certificaciones que expiran este trimestre
+   - Exámenes ocupacionales pendientes
+
+4. PROYECCIÓN
+   - Si el ritmo actual se mantiene, ¿se cumplirá el PASST a fin de año?
+   - Qué actividades priorizar para recuperar desfase
+   - Recomendación de reprogramación (si aplica)
+
+5. REPORTE PARA COMITÉ
+   - Resumen en 5 viñetas para presentar
+   - 3 acciones inmediatas requeridas
+   - KPIs clave para el mes siguiente
+
+FORMATO: Tablas con semáforo (🟢🔵🟡🔴). Incluir gráfico de avance mensual.</div></div>
+<div class="s"><h4>Generar presentación para comité</h4><p><span class="hl">"Crea una presentación de PowerPoint con el resumen ejecutivo del PASST. 6 diapositivas máximo."</span></p></div>
+<div class="s"><h4>Configurar alertas recurrentes</h4><p>En Teams: <span class="hl">"Crea un resumen mensual de vencimientos del PASST y envíalo a este canal el primer lunes de cada mes"</span></p><p>Para automatización real usa <span class="wn">Power Automate</span> (viene con M365). Copilot te guía.</p></div>
+<div class="s"><h4>Actualizar mes a mes</h4><p>Cada mes, abre el Excel actualizado y repite el prompt. Copilot compara y muestra tendencia.</p></div>
+</div>
+<div class="gb"><b>✅ Resultado:</b> Dashboard + brechas + alertas + presentación para comité. ~15 min vs. ~1-2 días manual.</div>
+<div class="rg">
+<div class="rc"><div class="ri">📊</div><b>Dashboard</b><span>% cumplimiento</span></div>
+<div class="rc"><div class="ri">🚨</div><b>Alertas</b><span>Vencimientos</span></div>
+<div class="rc"><div class="ri">📈</div><b>Proyección</b><span>Fin de año</span></div>
+<div class="rc"><div class="ri">🎤</div><b>PPT Comité</b><span>6 slides</span></div>
+</div>
+</div>
+
+<!-- T7: CONTRATISTAS -->
+<div class="tc" id="t7">
+<div class="card">
+<div class="ct"><span class="ci">🏗️</span> 7. Gestión de Contratistas — Paso a paso</div>
+<p style="font-size:.88em;color:var(--text2);margin-bottom:12px">Homologación, vencimientos y correos de observación</p>
+<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px"><span class="bdg be">Excel</span><span class="bdg bo">Outlook</span><span class="bdg bt">Teams</span></div>
+</div>
+<div class="sl">
+<div class="s"><h4>Crear matriz en Excel</h4><p><span class="act">Excel → Nuevo libro → ✨ Copilot</span></p></div>
+<div class="s"><h4>Pegar el prompt</h4>
+<div class="pb" id="p7"><button class="cb" onclick="cp('p7')">📋 Copiar</button>Actúa como administrador de contratos SST con experiencia en gestión de contratistas según [NORMATIVA: ej. DS 44/2024 art. 10 bis, RCT art. 20-23, RLS art. 26-28].
+
+GENERA una matriz de homologación de contratistas para [EMPRESA].
+
+DATOS DE CONTRATISTAS (pegar):
+[PEGAR: nombre, RUT/ID, contacto, documentos presentados, fechas vencimiento — puede ser desordenado]
+
+MATRIZ con columnas:
+N° | Empresa | RUT/ID | Contacto | Área servicio | Documento | Fecha presentación | Fecha vencimiento | Días hasta vencimiento | Estado (Vigente/Vencido/Próximo vencer &lt;30d) | Observación
+
+DOCUMENTOS A VERIFICAR:
+☐ Constancia seguro SST (mutualidad/SCTR)
+☐ Certificado vigencia seguro
+☐ Declaración cumplimiento normativo
+☐ Evaluación de riesgos del servicio
+☐ Reglamento interno SST
+☐ Certificado capacitación personal
+☐ Antecedentes siniestralidad
+☐ Autorizaciones especiales
+
+RESUMEN: Total contratistas | Vigentes | Con observaciones | Vencidos</div></div>
+<div class="s"><h4>Generar correos de observación (Outlook)</h4><p>Outlook → ✨ Copilot:</p><p><span class="hl">"Redacta un correo a [contratista] notificando documentos vencidos: [lista]. Referencia normativa: [artículo]. Plazo: 5 días hábiles. Tono profesional pero firme. CC al supervisor del área."</span></p></div>
+<div class="s"><h4>Configurar recordatorios mensuales</h4><p>Outlook → Copilot: <span class="hl">"Crea un recordatorio mensual para revisar vencimientos de documentación de contratistas el primer lunes de cada mes"</span></p><p>O mejor: usa <span class="hl">Power Automate</span> para correos automáticos 30 días antes del vencimiento.</p></div>
+<div class="s"><h4>Reporte en Teams</h4><p><span class="hl">"Genera un resumen del estado de contratistas: tabla con semáforo, próximos vencimientos, acciones requeridas"</span></p></div>
+</div>
+<div class="gb"><b>✅ Resultado:</b> Matriz de homologación + correos automáticos + sistema de alertas. ~20 min vs. ~1-2 días manual.</div>
+<div class="rg">
+<div class="rc"><div class="ri">📋</div><b>Matriz completa</b><span>Con semáforo</span></div>
+<div class="rc"><div class="ri">📧</div><b>Correos listo</b><span>Outlook directo</span></div>
+<div class="rc"><div class="ri">🔔</div><b>Alertas</b><span>30 días antes</span></div>
+<div class="rc"><div class="ri">💬</div><b>Teams</b><span>Resumen mensual</span></div>
+</div>
+</div>
+
+<!-- FOOTER -->
+
+<!-- T8: FLUJOS INTEGRADOS -->
+<div class="tc" id="t8">
+<div class="card">
+<div class="ct"><span class="ci">🔄</span> Flujos Integrados — De prompt a sistema de trabajo</div>
+<p style="font-size:.88em;color:var(--text2);margin-bottom:12px">Las cadenas app a app que convierten Copilot en tu motor SST real</p>
+<div class="tb"><b>Por que importan los flujos:</b> Un prompt aislado genera un documento. Un flujo integrado transforma un proceso completo, desde la captura en campo hasta el cierre de la accion correctiva, pasando por las apps correctas en el momento correcto.</div>
+</div>
+
+<div class="card">
+<div class="ct"><span class="ci">🟢</span> Flujo 1: Inspeccion en Campo → Cierre Completo</div>
+<p style="font-size:.82em;color:var(--accent2);margin-bottom:8px">El flujo mas usado, desde que caminas la planta hasta que la accion queda cerrada</p>
+<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px">
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:.88em;justify-content:center">
+<span class="bdg bt" style="font-size:.85em;padding:6px 14px">📱 Teams (Campo)</span>
+<span style="color:var(--accent2);font-size:1.2em">→</span>
+<span class="bdg bw" style="font-size:.85em;padding:6px 14px">📄 Word (Informe)</span>
+<span style="color:var(--accent2);font-size:1.2em">→</span>
+<span class="bdg bo" style="font-size:.85em;padding:6px 14px">📧 Outlook (Seguim.)</span>
+<span style="color:var(--accent2);font-size:1.2em">→</span>
+<span class="bdg bt" style="font-size:.85em;padding:6px 14px">📋 Teams/Planner (Cierre)</span>
+</div>
+</div>
+<div class="sl">
+<div class="s"><h4>Paso 1 — Captura en campo</h4>
+<p><span class="act">Teams (movil) → Chat contigo mismo o canal SST</span></p>
+<p>Abre Teams en tu celular. Dicta o escribe tus observaciones sueltas. Adjunta fotos desde la camara.</p>
+<div class="pb" id="f1a"><button class="cb" onclick="cp('f1a')">📋 Copiar</button>Ejemplo de notas rapidas en campo:
+
+Area descarga camiones:
+- Mancha de aceite cerca del surtidor, ~2m diametro
+- Extintor vencido (vence 15 mar 2025) en zona A
+- Operador sin lentes de seguridad en zona de transferencia
+- Guarda de bomba hidraulica floja, se mueve
+- Buen estado senalizacion emergencia
+
+Area bodega:
+- Pasillo de emergencia bloqueado con pallets
+- Salida de emergencia con chapa (sin barra antipanico)
+- Todo lo demas OK</div>
+<p><span class="wn">No ordenes, no formatees — Copilot lo hace despues.</span></p></div>
+<div class="s"><h4>Paso 2 — Generar informe profesional</h4>
+<p><span class="act">Word (desktop) → ✨ Copilot</span></p>
+<p>Copia tus notas de Teams. Abre Word → Copilot. Pega las notas + el prompt de la pestana <span class="hl">🔍 Inspecciones</span>. Adjunta las fotos.</p></div>
+<div class="s"><h4>Paso 3 — Correo de seguimiento</h4>
+<p><span class="act">Outlook → ✨ Copilot → Nuevo correo</span></p>
+<div class="pb" id="f1b"><button class="cb" onclick="cp('f1b')">📋 Copiar</button>Redacta un correo para los supervisores de [AREAS con hallazgos] notificando los hallazgos criticos y mayores del informe de inspeccion adjunto.
+
+Incluye:
+- Resumen de los 3 hallazgos mas urgentes
+- Plazo de 5 dias habiles para plan de accion
+- Solicitud de reunion de seguimiento en 1 semana
+- Adjuntar informe completo como referencia
+
+Tono: profesional, directo. CC: Gerencia de operaciones.</div></div>
+<div class="s"><h4>Paso 4 — Crear tareas y cerrar</h4>
+<p><span class="act">Teams → Canal SST → ✨ Copilot</span></p>
+<div class="pb" id="f1c"><button class="cb" onclick="cp('f1c')">📋 Copiar</button>Basado en el informe de inspeccion de [FECHA], crea tareas en Planner para cada accion correctiva:
+- Titulo: [Codigo hallazgo] + accion
+- Descripcion: hallazgo + causa raiz + accion especifica
+- Asignado a: [responsable del area]
+- Fecha limite: segun plazo del informe
+- Prioridad: Critica/Mayor/Menor segun clasificacion
+- Etiqueta: "Inspeccion [Fecha]"
+
+Organiza las tareas en bucket por area.</div></div>
+</div>
+<div class="gb"><b>✅ Flujo completo:</b> Notas campo → Informe Word → Correo Outlook → Tareas Planner → Cierre. <b>Tiempo total: ~30 min</b> vs. ~2-3 dias manual.</div>
+</div>
+
+<div class="card">
+<div class="ct"><span class="ci">🔵</span> Flujo 2: IPERC → Mapa de Riesgos → Senalizacion</div>
+<p style="font-size:.82em;color:var(--accent2);margin-bottom:8px">De la evaluacion de riesgos al plan de senalizacion implementado</p>
+<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px">
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:.88em;justify-content:center">
+<span class="bdg be" style="font-size:.85em;padding:6px 14px">📋 Excel (IPERC)</span>
+<span style="color:var(--accent2);font-size:1.2em">→</span>
+<span class="bdg bw" style="font-size:.85em;padding:6px 14px">📄 Word (Mapa R.)</span>
+<span style="color:var(--accent2);font-size:1.2em">→</span>
+<span class="bdg bp" style="font-size:.85em;padding:6px 14px">📊 PPT (Presentacion)</span>
+<span style="color:var(--accent2);font-size:1.2em">→</span>
+<span class="bdg bt" style="font-size:.85em;padding:6px 14px">📋 Teams (Aprobacion)</span>
+</div>
+</div>
+<div class="sl">
+<div class="s"><h4>Paso 1 — IPERC en Excel</h4>
+<p><span class="act">Excel → ✨ Copilot</span></p>
+<p>Genera la IPERC con el prompt de la pestana <span class="hl">📋 IPERC</span>. Guarda en SharePoint.</p></div>
+<div class="s"><h4>Paso 2 — Generar Mapa de Riesgos desde IPERC</h4>
+<p><span class="act">Word → ✨ Copilot → Adjuntar IPERC</span></p>
+<div class="pb" id="f2a"><button class="cb" onclick="cp('f2a')">📋 Copiar</button>Con base en la IPERC adjunta, genera un Mapa de Riesgos de [EMPRESA].
+
+Extrae de la IPERC:
+- Areas con mayor concentracion de riesgos intolerables e importantes
+- Controles faltantes que genera la IPERC
+- Personal expuesto por area
+
+Genera:
+1. Tabla de zonificacion: Area | Nivel riesgo predominante | Color | Controles faltantes | Prioridad intervencion
+2. Plan de senalizacion por zona basado en los peligros identificados en la IPERC
+3. Lista de zonas que requieren implementacion inmediata de controles
+
+FORMATO: Tabla con codigo de colores. Documento para comite de SST.</div></div>
+<div class="s"><h4>Paso 3 — Presentacion para aprobacion</h4>
+<p><span class="act">Word → Copilot → "Convierte en presentacion de 6 diapositivas"</span></p></div>
+<div class="s"><h4>Paso 4 — Revision y aprobacion en Teams</h4>
+<p><span class="act">Teams → Canal SST → Adjuntar PPT</span></p>
+<p><span class="hl">"Resume este Mapa de Riesgos en 5 puntos clave para el comite. Resalta las 3 zonas criticas que requieren aprobacion de presupuesto."</span></p></div>
+</div>
+<div class="gb"><b>✅ Flujo completo:</b> IPERC Excel → Mapa Word → PPT aprobacion → Teams. <b>Tiempo total: ~40 min</b> vs. ~1 semana manual.</div>
+</div>
+
+<div class="card">
+<div class="ct"><span class="ci">🟠</span> Flujo 3: PASST Mensual → Comite → Acciones</div>
+<p style="font-size:.82em;color:var(--accent2);margin-bottom:8px">Reporte mensual, presentacion y seguimiento de compromisos</p>
+<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px">
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:.88em;justify-content:center">
+<span class="bdg be" style="font-size:.85em;padding:6px 14px">📊 Excel (PASST)</span>
+<span style="color:var(--accent2);font-size:1.2em">→</span>
+<span class="bdg bp" style="font-size:.85em;padding:6px 14px">📊 PPT (Comite)</span>
+<span style="color:var(--accent2);font-size:1.2em">→</span>
+<span class="bdg bt" style="font-size:.85em;padding:6px 14px">📋 Teams (Compromisos)</span>
+<span style="color:var(--accent2);font-size:1.2em">→</span>
+<span class="bdg bo" style="font-size:.85em;padding:6px 14px">📧 Outlook (Acta)</span>
+</div>
+</div>
+<div class="sl">
+<div class="s"><h4>Paso 1 — Analizar PASST en Excel</h4>
+<p><span class="act">Excel → Abrir PASST → ✨ Copilot</span></p>
+<p>Usa el prompt de la pestana <span class="hl">📊 PASST</span>. Genera dashboard con brechas y alertas.</p></div>
+<div class="s"><h4>Paso 2 — Presentacion para comite</h4>
+<p><span class="act">Copilot → "Crea PPT de 6 diapositivas con resumen ejecutivo"</span></p></div>
+<div class="s"><h4>Paso 3 — Registrar compromisos en Teams</h4>
+<p><span class="act">Teams → Canal SST → Reunion con Copilot activado</span></p>
+<p>Durante la reunion del comite, Copilot transcribe automaticamente. Al finalizar:</p>
+<div class="pb" id="f3a"><button class="cb" onclick="cp('f3a')">📋 Copiar</button>Basado en la transcripcion de la reunion del comite de SST, genera:
+1. Acta de reunion con acuerdos y compromisos
+2. Lista de compromisos con: responsable, plazo, indicador de verificacion
+3. Crea tareas en Planner para cada compromiso con las fechas acordadas
+4. Resumen de 3 vinetas para compartir con gerencia</div></div>
+<div class="s"><h4>Paso 4 — Enviar acta por correo</h4>
+<p><span class="act">Outlook → ✨ Copilot</span></p>
+<p><span class="hl">"Redacta un correo con el acta del comite de SST adjunta. Resaltar los 3 compromisos mas criticos. Enviar a todos los asistentes + gerencia."</span></p></div>
+</div>
+<div class="gb"><b>✅ Flujo completo:</b> PASST Excel → PPT Comite → Transcripcion Teams → Tareas Planner → Acta Outlook. <b>Tiempo total: ~45 min</b> vs. ~3-4 dias manual.</div>
+</div>
+
+<div class="card">
+<div class="ct"><span class="ci">🔴</span> Flujo 4: Contratista Vencido → Regularizacion</div>
+<p style="font-size:.82em;color:var(--accent2);margin-bottom:8px">Deteccion de documentos vencidos hasta la regularizacion completa</p>
+<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px">
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:.88em;justify-content:center">
+<span class="bdg be" style="font-size:.85em;padding:6px 14px">📋 Excel (Matriz)</span>
+<span style="color:var(--accent2);font-size:1.2em">→</span>
+<span class="bdg bo" style="font-size:.85em;padding:6px 14px">📧 Outlook (Correo)</span>
+<span style="color:var(--accent2);font-size:1.2em">→</span>
+<span class="bdg bo" style="font-size:.85em;padding:6px 14px">📧 Outlook (Escala)</span>
+<span style="color:var(--accent2);font-size:1.2em">→</span>
+<span class="bdg bt" style="font-size:.85em;padding:6px 14px">📋 Teams (Reporte)</span>
+</div>
+</div>
+<div class="sl">
+<div class="s"><h4>Paso 1 — Identificar vencidos</h4>
+<p><span class="act">Excel → Abrir matriz → ✨ Copilot</span></p>
+<div class="pb" id="f4a"><button class="cb" onclick="cp('f4a')">📋 Copiar</button>Analiza la matriz de contratistas. Identifica documentos vencidos o que vencen en los proximos 30 dias. Genera:
+1. Lista priorizada: Contratista | Documento | Dias vencido | Norma que incumple
+2. Riesgo legal de cada vencimiento
+3. Clasificacion: Critico (seguro vencido) / Mayor (capacitacion) / Menor (tramite)</div></div>
+<div class="s"><h4>Paso 2 — Correo de observacion</h4>
+<p><span class="act">Outlook → ✨ Copilot</span></p>
+<div class="pb" id="f4b"><button class="cb" onclick="cp('f4b')">📋 Copiar</button>Redacta un correo a [CONTRATISTA] notificando:
+
+DOCUMENTOS VENCIDOS: [lista]
+NORMA INCUMPLIDA: [articulo especifico]
+PLAZO REGULARIZACION: 5 dias habiles
+CONSECUENCIA: Sin regularizacion, se suspendera acceso a instalaciones.
+
+Tono: profesional, firme. CC: Supervisor del area + Jefe de SST.</div></div>
+<div class="s"><h4>Paso 3 — Escalamiento (si no responde)</h4>
+<p><span class="act">Outlook → ✨ Copilot</span></p>
+<div class="pb" id="f4c"><button class="cb" onclick="cp('f4c')">📋 Copiar</button>Redacta correo de escalamiento a gerencia de operaciones informando que el contratista [NOMBRE] no ha regularizado documentos notificados el [FECHA]:
+
+- Documentos pendientes: [lista]
+- Dias transcurridos: [N]
+- Norma incumplida: [articulo]
+- Solicitar: autorizacion para suspender acceso hasta regularizacion
+
+Tono: ejecutivo, directo. CC: Gerencia general + Legal.</div></div>
+<div class="s"><h4>Paso 4 — Reporte mensual Teams</h4>
+<p><span class="act">Teams → Canal SST</span></p>
+<p><span class="hl">"Genera resumen mensual del estado de contratistas: vigentes, con observacion, vencidos. Tabla con semaforo."</span></p></div>
+</div>
+<div class="gb"><b>✅ Flujo completo:</b> Deteccion Excel → Notificacion → Escalamiento → Reporte. <b>Tiempo total: ~15 min</b> vs. ~2-3 dias.</div>
+</div>
+
+<div class="card">
+<div class="ct"><span class="ci">🟣</span> Flujo 5: Incidente → Investigacion → Leccion Aprendida</div>
+<p style="font-size:.82em;color:var(--accent2);margin-bottom:8px">Desde el reporte inicial hasta la difusion de la leccion aprendida</p>
+<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px">
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:.88em;justify-content:center">
+<span class="bdg bt" style="font-size:.85em;padding:6px 14px">📱 Teams (Reporte)</span>
+<span style="color:var(--accent2);font-size:1.2em">→</span>
+<span class="bdg bw" style="font-size:.85em;padding:6px 14px">📄 Word (Invest.)</span>
+<span style="color:var(--accent2);font-size:1.2em">→</span>
+<span class="bdg bp" style="font-size:.85em;padding:6px 14px">📊 PPT (Causa raiz)</span>
+<span style="color:var(--accent2);font-size:1.2em">→</span>
+<span class="bdg bo" style="font-size:.85em;padding:6px 14px">📧 Outlook (Difusion)</span>
+</div>
+</div>
+<div class="sl">
+<div class="s"><h4>Paso 1 — Reporte inmediato en Teams</h4>
+<p><span class="act">Teams (celular) → Canal SST</span></p>
+<div class="pb" id="f5a"><button class="cb" onclick="cp('f5a')">📋 Copiar</button>INCIDENTE REPORTADO:
+Fecha/hora: [Cuando ocurrio]
+Area: [Donde]
+Tipo: [Accidente / Cuasi-accidente / Enfermedad / Incidente ambiental]
+Descripcion breve: [Que paso]
+Personas involucradas: [Nombres]
+Gravedad: [Leve / Grave / Fatal]
+Accion inmediata tomada: [Que se hizo al instante]</div></div>
+<div class="s"><h4>Paso 2 — Investigacion en Word</h4>
+<p><span class="act">Word → ✨ Copilot</span></p>
+<div class="pb" id="f5b"><button class="cb" onclick="cp('f5b')">📋 Copiar</button>Actua como investigador de incidentes SST certificado. Genera un informe de investigacion completo.
+
+DATOS DEL INCIDENTE:
+[PEGAR reporte del Paso 1]
+
+ESTRUCTURA:
+1. DATOS GENERALES — Fecha, hora, area, tipo, gravedad
+2. DESCRIPCION DEL INCIDENTE — cronologia detallada
+3. ANALISIS DE CAUSA RAIZ — Metodo 5 Porques + Diagrama Ishikawa (Huesos: Metodo, Maquina, Medio, Mano, Materia)
+4. CAUSAS INMEDIATAS — actos y condiciones subestandar
+5. CAUSAS BASICAS — factores organizacionales y personales
+6. ACCIONES CORRECTIVAS — Tabla: Causa | Accion | Responsable | Plazo | Verificacion
+7. LECCIONES APRENDIDAS — 3 puntos clave para difundir
+8. CONCLUSIONES — recomendaciones para evitar recurrencia
+
+NORMATIVA: [Normas del pais para investigacion de accidentes]</div></div>
+<div class="s"><h4>Paso 3 — Presentacion causa raiz</h4>
+<p><span class="act">Word → Copilot → "Convierte en PPT de 5 diapositivas enfocado en causa raiz y lecciones aprendidas"</span></p></div>
+<div class="s"><h4>Paso 4 — Difusion de leccion aprendida</h4>
+<p><span class="act">Outlook → ✨ Copilot</span></p>
+<div class="pb" id="f5c"><button class="cb" onclick="cp('f5c')">📋 Copiar</button>Redacta correo de difusion de leccion aprendida del incidente del [FECHA] en [AREA].
+
+Incluir:
+- Resumen breve del incidente (2 lineas)
+- Causa raiz principal
+- 3 lecciones aprendidas
+- Accion concreta que cada trabajador debe tomar
+- Link al procedimiento actualizado (si aplica)
+
+Tono: preventivo, no punitivo. Enviar a toda la organizacion.
+Asunto: ⚠️ LECCION APRENDIDA — [Tema del incidente]</div>
+<p>Comparte tambien en canal SST con tag <span class="hl">🟣 Leccion Aprendida</span>.</p></div>
+</div>
+<div class="gb"><b>✅ Flujo completo:</b> Reporte Teams → Investigacion Word → PPT Causa raiz → Difusion Outlook+Teams. <b>Tiempo total: ~1 hora</b> vs. ~1-2 semanas manual.</div>
+</div>
+
+<div class="card">
+<div class="ct"><span class="ci">📊</span> Resumen de Flujos</div>
+<table class="ctbl">
+<tr><th>Flujo</th><th>Apps</th><th>Pasos</th><th>Tiempo Copilot</th><th>Tiempo Manual</th><th>Ahorro</th></tr>
+<tr><td>🟢 Inspeccion → Cierre</td><td>Teams→Word→Outlook→Planner</td><td>4</td><td>~30 min</td><td>2-3 dias</td><td class="y">~90%</td></tr>
+<tr><td>🔵 IPERC → Senalizacion</td><td>Excel→Word→PPT→Teams</td><td>4</td><td>~40 min</td><td>1 semana</td><td class="y">~90%</td></tr>
+<tr><td>🟠 PASST → Comite</td><td>Excel→PPT→Teams→Outlook</td><td>4</td><td>~45 min</td><td>3-4 dias</td><td class="y">~85%</td></tr>
+<tr><td>🔴 Contratista → Regulariz.</td><td>Excel→Outlook→Outlook→Teams</td><td>4</td><td>~15 min</td><td>2-3 dias</td><td class="y">~90%</td></tr>
+<tr><td>🟣 Incidente → Leccion</td><td>Teams→Word→PPT→Outlook</td><td>4</td><td>~1 hora</td><td>1-2 semanas</td><td class="y">~85%</td></tr>
+</table>
+<div class="wb"><b>⚠️ Regla de oro:</b> SIEMPRE revisa lo que genera Copilot antes de enviar o presentar. La IA es tu motor, tu eres el piloto. Especialmente: normas referenciadas, niveles de riesgo y causas raiz — valida con tu experiencia.</div>
+</div>
+</div>
+<div class="ft">
+<p>🤖 Implementación Copilot Premium × SST — Guía Paso a Paso</p>
+<p>Universal · Adaptable a cualquier industria · Solo M365</p>
+<p style="margin-top:8px">Reemplaza las <span style="color:var(--orange)">[variables]</span> → Copia → Pega en Copilot → Itera</p>
+</div>
+
+<script>
+function sw(id){
+  document.querySelectorAll('.tc').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  window.scrollTo({top:document.querySelector('.tabs').offsetTop-10,behavior:'smooth'});
+}
+function cp(id){
+  const el=document.getElementById(id);
+  const btn=el.querySelector('.cb');
+  let text=el.innerText.replace('📋 Copiar','').trim();
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='✅ Copiado!';
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='📋 Copiar';btn.classList.remove('copied');},2000);
+  });
+}
+</script>
+</body>
+</html>

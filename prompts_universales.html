@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompts IA × SST — Guía Universal Copilot</title>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#242836;--accent:#6C5CE7;--accent2:#A29BFE;--green:#00B894;--orange:#FDCB6E;--red:#E17055;--blue:#74B9FF;--text:#E8E8ED;--text2:#9CA3AF;--border:#2D3140;--radius:12px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:20px;max-width:960px;margin:0 auto}
+h1{font-size:1.8em;margin-bottom:6px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{color:var(--text2);font-size:.95em;margin-bottom:24px}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75em;font-weight:600;margin-right:6px}
+.badge-copilot{background:#6C5CE722;color:var(--accent2);border:1px solid #6C5CE744}
+.badge-word{background:#2B579A22;color:#2B579A;border:1px solid #2B579A44}
+.badge-excel{background:#21734622;color:#217346;border:1px solid #21734644}
+.badge-outlook{background:#0078D422;color:#0078D4;border:1px solid #0078D444}
+.badge-teams{background:#6264A722;color:#6264A7;border:1px solid #6264A744}
+.badge-power{background:#74219222;color:#742192;border:1px solid #74219244}
+.section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px}
+.section-title{font-size:1.2em;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:10px}
+.section-title .icon{font-size:1.4em}
+.ahorro{font-size:.8em;color:var(--green);font-weight:600;margin-bottom:12px}
+.prompt-box{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;margin:12px 0;position:relative;font-family:'Cascadia Code','Fira Code',monospace;font-size:.85em;line-height:1.8;white-space:pre-wrap;word-break:break-word;max-height:400px;overflow-y:auto}
+.prompt-box .var{color:var(--orange);font-weight:600}
+.prompt-box .comment{color:var(--text2);font-style:italic}
+.copy-btn{position:absolute;top:8px;right:8px;background:var(--accent);color:white;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:.75em;font-weight:600;transition:all .2s}
+.copy-btn:hover{background:var(--accent2);transform:scale(1.05)}
+.copy-btn.copied{background:var(--green)}
+.tips{background:#6C5CE710;border-left:3px solid var(--accent);padding:12px 16px;border-radius:0 8px 8px 0;margin:12px 0;font-size:.88em}
+.tips strong{color:var(--accent2)}
+.where{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.entregable{background:var(--green);color:#000;font-size:.78em;font-weight:700;padding:3px 10px;border-radius:6px;display:inline-block;margin:3px 2px}
+.flujo{display:flex;gap:8px;align-items:center;margin:12px 0;flex-wrap:wrap}
+.flujo .step{background:var(--surface2);border:1px solid var(--border);padding:8px 14px;border-radius:8px;font-size:.82em;text-align:center;flex:1;min-width:100px}
+.flujo .step b{color:var(--accent2)}
+.flujo .arrow{color:var(--text2);font-size:1.2em}
+.intro-box{background:linear-gradient(135deg,#6C5CE715,#A29BFE10);border:1px solid #6C5CE733;border-radius:var(--radius);padding:20px;margin-bottom:24px}
+.intro-box h2{font-size:1.1em;margin-bottom:8px;color:var(--accent2)}
+.intro-box ul{padding-left:20px}
+.intro-box li{margin-bottom:4px;font-size:.9em}
+.compat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:16px 0}
+.compat-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;font-size:.82em}
+.compat-card .app-icon{font-size:1.6em;margin-bottom:4px}
+.compat-card b{display:block;color:var(--accent2)}
+details{margin:8px 0}
+details summary{cursor:pointer;color:var(--accent2);font-size:.9em;font-weight:600;padding:4px 0}
+details summary:hover{color:var(--accent)}
+.var-list{display:grid;grid-template-columns:1fr 2fr;gap:4px 12px;font-size:.82em;margin:8px 0;padding:8px 12px;background:var(--surface2);border-radius:6px}
+.var-list dt{color:var(--orange);font-weight:600;font-family:monospace}
+.var-list dd{color:var(--text2)}
+.footer{text-align:center;color:var(--text2);font-size:.78em;margin-top:30px;padding:20px 0;border-top:1px solid var(--border)}
+@media(max-width:640px){body{padding:12px}.section{padding:16px}.prompt-box{font-size:.78em;padding:12px}.flujo{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<h1>🤖 Prompts IA × SST</h1>
+<p class="subtitle">Guía universal para Microsoft Copilot — 7 procesos automatizables<br>Adaptable a cualquier industria, normativa y organización</p>
+
+<div class="intro-box">
+<h2>📋 Cómo usar esta guía</h2>
+<ul>
+<li><strong>Copia el prompt</strong> → pégalo en Copilot (Word, Excel, Outlook, Teams o Copilot Studio)</li>
+<li><strong>Reemplaza las variables</strong> <span style="color:var(--orange)">[entre corchetes]</span> con tu información</li>
+<li><strong>Itera</strong> → si el resultado no es exacto, pide ajustes con contexto adicional</li>
+<li><strong>Guarda los buenos</strong> → los prompts que funcionan guárdalos como plantillas en SharePoint/OneDrive</li>
+</ul>
+</div>
+
+<div class="compat-grid">
+<div class="compat-card"><div class="app-icon">📝</div><b>Word</b>Procedimientos, informes, checklists</div>
+<div class="compat-card"><div class="app-icon">📊</div><b>Excel</b>Matrices, seguimiento, KPIs</div>
+<div class="compat-card"><div class="app-icon">📧</div><b>Outlook</b>Correos, notificaciones, alertas</div>
+<div class="compat-card"><div class="app-icon">💬</div><b>Teams</b>Actas, resúmenes, bot SST</div>
+<div class="compat-card"><div class="app-icon">⚡</div><b>Power Automate</b>Flujos automatizados</div>
+<div class="compat-card"><div class="app-icon">🤖</div><b>Copilot Studio</b>Bot personalizado SST</div>
+</div>
+
+<!-- ═══════════════════════ PROCESO 1 ═══════════════════════ -->
+<div class="section">
+<div class="section-title"><span class="icon">🗺️</span> 1. Mapa de Riesgos por Zonificación</div>
+<div class="ahorro">⏱️ Ahorro estimado: ~70% vs. método manual desde planos</div>
+<div class="where"><span class="badge badge-word">Word</span><span class="badge badge-excel">Excel</span><span class="badge badge-copilot">Copilot Chat</span></div>
+
+<div class="flujo">
+<div class="step"><b>1.</b> Sube plano/layout del área</div>
+<div class="arrow">→</div>
+<div class="step"><b>2.</b> Copia el prompt</div>
+<div class="arrow">→</div>
+<div class="step"><b>3.</b> Revisa y ajusta zonificación</div>
+</div>
+
+<div class="prompt-box" id="p1"><button class="copy-btn" onclick="copyPrompt('p1')">📋 Copiar</button>Actúa como un especialista en seguridad y salud ocupacional con experiencia en elaboración de mapas de riesgos.
+
+OBJETIVO: Generar una zonificación de riesgos para las áreas de <span class="var">[NOMBRE EMPRESA]</span>, sector <span class="var">[INDUSTRIA/RUBRO]</span>, ubicada en <span class="var">[PAÍS/REGIÓN]</span>.
+
+CONTEXTO:
+- Instalaciones: <span class="var">[DESCRIBIR ÁREAS: ej. planta producción, bodegas, oficinas, patios, estacionamientos]</span>
+- Normativa aplicable: <span class="var">[LISTAR NORMAS: ej. DS 594, DS 44, Ley 16.744, NCh ISO 45001]</span>
+- Trabajadores: <span class="var">[NÚMERO] aproximadamente, en turnos <span class="var">[MAÑANA/TARDE/NOCHE]</span>
+
+ENTREGABLE:
+1. Tabla de zonificación por área con columnas: Área | Peligros identificados | Nivel de riesgo (Crítico/Alto/Medio/Bajo) | Color semáforo | Personal expuesto | Controles existentes | Controles faltantes
+2. Listado de zonas críticas que requieren intervención inmediata
+3. Recomendaciones de señalización por zona según normativa <span class="var">[NORMATIVA SEÑALIZACIÓN]</span>
+
+FORMATO: Tabla en formato documento con código de colores. Incluir resumen ejecutivo al inicio.</div>
+
+<details><summary>📌 Variables y ejemplo</summary>
+<div class="var-list">
+<dt>[NOMBRE EMPRESA]</dt><dd>Nombre de la organización</dd>
+<dt>[INDUSTRIA/RUBRO]</dt><dd>Ej: minería, alimentos, construcción, manufactura</dd>
+<dt>[PAÍS/REGIÓN]</dt><dd>Ej: Chile, Colombia, México, Perú</dd>
+<dt>[DESCRIBIR ÁREAS]</dt><dd>Listado de áreas físicas de la instalación</dd>
+<dt>[NORMAS]</dt><dd>Normativa legal aplicable del país</dd>
+<dt>[NORMATIVA SEÑALIZACIÓN]</dt><dd>Ej: NCh 1411/4 (Chile), NOM-026 (México)</dd>
+</div>
+<div class="tips"><strong>Tip Copilot Word:</strong> Si tienes un plano o layout en imagen, adjúntalo al chat de Copilot antes del prompt para que analice la distribución física.</div>
+</details>
+
+<div class="tips"><strong>Entregables que obtendrás:</strong> <span class="entregable">Tabla zonificación</span> <span class="entregable">Zonas críticas</span> <span class="entregable">Plan señalización</span></div>
+</div>
+
+<!-- ═══════════════════════ PROCESO 2 ═══════════════════════ -->
+<div class="section">
+<div class="section-title"><span class="icon">📋</span> 2. Matriz IPERC Continua</div>
+<div class="ahorro">⏱️ Ahorro estimado: ~75% vs. elaboración manual desde cero</div>
+<div class="where"><span class="badge badge-excel">Excel</span><span class="badge badge-word">Word</span><span class="badge badge-copilot">Copilot Chat</span></div>
+
+<div class="flujo">
+<div class="step"><b>1.</b> Lista tus actividades/puestos</div>
+<div class="arrow">→</div>
+<div class="step"><b>2.</b> Copia el prompt</div>
+<div class="arrow">→</div>
+<div class="step"><b>3.</b> Adjunta fotos de campo (opcional)</div>
+</div>
+
+<div class="prompt-box" id="p2"><button class="copy-btn" onclick="copyPrompt('p2')">📋 Copiar</button>Actúa como un experto en identificación de peligros y evaluación de riesgos (IPERC) con conocimiento en <span class="var">[NORMATIVA APLICABLE: ej. DS 44/2024 Chile, Ley 29783 Perú, RCT Colombia]</span>.
+
+OBJETIVO: Generar una Matriz IPERC para <span class="var">[NOMBRE EMPRESA]</span>, sector <span class="var">[INDUSTRIA]</span>.
+
+CONTEXTO OPERACIONAL:
+- Actividades principales: <span class="var">[LISTAR: ej. operación maquinaria, manejo de sustancias, trabajo en altura, izaje, conducción]</span>
+- Puestos de trabajo: <span class="var">[LISTAR: ej. operador, técnico, supervisor, conductor, auxiliar]</span>
+- Sustancias/equipos peligrosos: <span class="var">[LISTAR SI APLICA: ej. químicos, gases, equipos bajo presión]</span>
+- Metodología de evaluación: <span class="var">[MATRIZ 3x3 / 4x4 / 5x5] — probabilidad × severidad</span>
+
+ENTREGABLE — Tabla IPERC con columnas:
+1. N° | 2. Área/Proceso | 3. Puesto | 4. Actividad | 5. Tarea | 6. Peligro | 7. Riesgo (descripción) | 8. Tipo de riesgo (Físico/Químico/Biológico/Mecánico/Eléctrico/Psicosocial/Ergonómico) | 9. Probabilidad (A/M/B) | 10. Severidad (A/M/B) | 11. Nivel de riesgo | 12. Valoración (Trivial/Tolerable/Moderado/Importante/Intolerable) | 13. Medidas de control — Jerarquía: Eliminación → Sustitución → Controles de ingeniería → Controles administrativos → EPP | 14. Norma aplicable | 15. Responsable | 16. Fecha revisión
+
+INSTRUCCIONES ADICIONALES:
+- Para cada riesgo, sugerir al menos 2 controles en la jerarquía (nunca solo EPP)
+- Referenciar la norma específica que aplica a cada control
+- Incluir una fila de resumen al final con: total riesgos por nivel, % por tipo
+- Si adjunto fotos del puesto de trabajo, analízalas para identificar peligros visibles
+
+FORMATO: Tabla Excel con filtros y formato condicional por nivel de riesgo (rojo=intolerable, naranja=importante, amarillo=moderado, verde=tolerable, gris=trivial).</div>
+
+<details><summary>📌 Variables y ejemplo</summary>
+<div class="var-list">
+<dt>[NORMATIVA APLICABLE]</dt><dd>Norma legal de SST del país para IPERC</dd>
+<dt>[INDUSTRIA]</dt><dd>Rubro principal de la empresa</dd>
+<dt>[MATRIZ 3x3/4x4/5x5]</dt><dd>Definir tamaño de la matriz de evaluación</dd>
+</div>
+<div class="tips"><strong>Tip Copilot Excel:</strong> Pídele que genere la tabla con formato condicional automático. Después puedes agregar validación de datos en las columnas de Probabilidad y Severidad para que sean listas desplegables.</div>
+</details>
+
+<div class="tips"><strong>Entregables que obtendrás:</strong> <span class="entregable">Matriz IPERC completa</span> <span class="entregable">Jerarquía de controles</span> <span class="entregable">Resumen estadístico</span> <span class="entregable">Formato condicional</span></div>
+</div>
+
+<!-- ═══════════════════════ PROCESO 3 ═══════════════════════ -->
+<div class="section">
+<div class="section-title"><span class="icon">✅</span> 3. Checklists de Inspección Pre-Uso</div>
+<div class="ahorro">⏱️ Ahorro estimado: ~85% vs. diseñar checklists desde cero</div>
+<div class="where"><span class="badge badge-word">Word</span><span class="badge badge-excel">Excel</span><span class="badge badge-teams">Teams</span></div>
+
+<div class="flujo">
+<div class="step"><b>1.</b> Indica el equipo/vehículo</div>
+<div class="arrow">→</div>
+<div class="step"><b>2.</b> Copia el prompt</div>
+<div class="arrow">→</div>
+<div class="step"><b>3.</b> Personaliza ítems y publica</div>
+</div>
+
+<div class="prompt-box" id="p3"><button class="copy-btn" onclick="copyPrompt('p3')">📋 Copiar</button>Actúa como un inspector de seguridad certificado con experiencia en inspecciones pre-uso de equipos según <span class="var">[NORMATIVA: ej. protocolo SUSESO, manufacturer specifications, DS 44/2024]</span>.
+
+OBJETIVO: Generar un checklist de inspección pre-uso para <span class="var">[TIPO DE EQUIPO/VEHÍCULO]</span>, marca <span class="var">[MARCA/MODELO SI CONOCE]</span>, usado en <span class="var">[CONTEXTO: ej. faena minera, planta industrial, obra construction, transporte]</span>.
+
+ESTRUCTURA DEL CHECKLIST:
+A. DATOS GENERALES
+- Fecha | Hora | Inspeccionado por | Turno | Equipo N° | Horómetro/Kilometraje
+
+B. ÍTEMS DE INSPECCIÓN por sistema (agregar/quitar según equipo):
+1. Sistema estructural: grietas, deformaciones, soldaduras, corrosión
+2. Sistema eléctrico: cableado, conexiones, protecciones, puesta a tierra
+3. Sistema hidráulico/neumático: mangueras, cilindros, fugas, presiones
+4. Sistema mecánico: motor, transmisión, frenos, dirección
+5. Sistema de seguridad: paradas de emergencia, guardas, alarmas, extintor
+6. EPP del operador: casco, guantes, lentes, calzado, arnés (si aplica)
+7. Documentación: licencia vigente, seguro, certificado de revisión
+
+C. Cada ítem debe tener: N° | Componente | Criterio de aceptación | Estado (✅ OK / ⚠️ Observación / ❌ No conforme) | Observación
+
+D. RESULTADO DE LA INSPECCIÓN
+- [ ] APTO para operación
+- [ ] APTO CON OBSERVACIONES (detallar)
+- [ ] NO APTO — Bloquear hasta reparación
+
+E. FIRMAS: Operador ________ Supervisor ________ Fecha próxima inspección: ________
+
+FORMATO: Tabla lista para imprimir o usar en dispositivo móvil. Una página por equipo.</div>
+
+<details><summary>📌 Ejemplos de equipos</summary>
+<div class="tips">
+<strong>Equipos típicos por industria:</strong><br>
+🏭 Manufactura: montacargas, grúas puente, compresores, calderas<br>
+⛏️ Minería: camiones mineros, palas, perforadoras, chancadores<br>
+🏗️ Construcción: grúas torre, excavadoras, andamios, hormigoneras<br>
+🚛 Transporte: camiones, acoplados, sistemas de frenos ABS<br>
+🛢️ Petróleo/Química: bombas, válvulas, sistemas de tuberías, tanques<br>
+🌾 Agro: tractores, cosechadoras, sistemas de riego, fumigación
+</div>
+</details>
+
+<div class="tips"><strong>Entregables que obtendrás:</strong> <span class="entregable">Checklist completo</span> <span class="entregable">Criterios de aceptación</span> <span class="entregable">Formato firmas</span> <span class="entregable">Lista para móvil</span></div>
+</div>
+
+<!-- ═══════════════════════ PROCESO 4 ═══════════════════════ -->
+<div class="section">
+<div class="section-title"><span class="icon">🔍</span> 4. Inspecciones en Campo → Informe</div>
+<div class="ahorro">⏱️ Ahorro estimado: ~60% vs. redactar informe manualmente</div>
+<div class="where"><span class="badge badge-word">Word</span><span class="badge badge-outlook">Outlook</span><span class="badge badge-teams">Teams</span></div>
+
+<div class="flujo">
+<div class="step"><b>1.</b> Toma notas/fotos en campo</div>
+<div class="arrow">→</div>
+<div class="step"><b>2.</b> Pega notas en el prompt</div>
+<div class="arrow">→</div>
+<div class="step"><b>3.</b> Obtén informe estructurado</div>
+</div>
+
+<div class="prompt-box" id="p4"><button class="copy-btn" onclick="copyPrompt('p4')">📋 Copiar</button>Actúa como un inspector de seguridad senior. Transforma las siguientes notas de campo en un informe de inspección profesional.
+
+DATOS DE LA INSPECCIÓN:
+- Empresa: <span class="var">[NOMBRE EMPRESA]</span>
+- Área inspeccionada: <span class="var">[ÁREA/SECTOR]</span>
+- Fecha: <span class="var">[FECHA]</span>
+- Inspector: <span class="var">[NOMBRE]</span>
+- Normativa de referencia: <span class="var">[NORMATIVA APLICABLE]</span>
+
+NOTAS DE CAMPO (pegar directamente):
+<span class="var">[PEGAR AQUÍ LAS NOTAS: observaciones sueltas, puntos, palabras clave, voice-to-text, fotos descripciones — NO necesita estar ordenado]</span>
+
+ESTRUCTURA DEL INFORME:
+1. RESUMEN EJECUTIVO
+   - Fecha, área, inspector
+   - Hallazgos totales por categoría (crítico/mayor/menor/observación)
+   - Tendencia vs. inspección anterior (si hay datos)
+
+2. HALLAZGOS DETALLADOS
+   Para cada hallazgo:
+   a) Código (H-001, H-002...)
+   b) Ubicación exacta
+   c) Descripción del hallazgo (redacción profesional)
+   d) Clasificación: Crítico / Mayor / Menor / Observación
+   e) Norma incumplida (artículo/sección específica)
+   f) Análisis de causa raíz (método 5 Porqués)
+   g) Acción correctiva con responsable y plazo
+   h) Evidencia fotográfica (referencia: "Ver Foto N°")
+
+3. PLAN DE ACCIONES CORRECTIVAS
+   Tabla: N° | Hallazgo | Acción | Responsable | Plazo | Estado | Verificación
+
+4. CONCLUSIONES Y RECOMENDACIONES
+   - Patrones observados
+   - Áreas que requieren atención prioritaria
+   - Seguimiento propuesto (fecha próxima inspección)
+
+TONO: Profesional, objetivo, basado en evidencia. Sin calificativos subjetivos.</div>
+
+<details><summary>📌 Tip para notas desordenadas</summary>
+<div class="tips"><strong>Copilot puede procesar:</strong><br>
+✅ Notas sueltas: "sección 3 fuga aceite grúa 2 operador sin casco extintor vencido"<br>
+✅ Voice-to-text: tu grabación de voz transcrita directamente<br>
+✅ Fotos: adjunta las imágenes y Copilot las describe como evidencia<br>
+✅ Lista WhatsApp: copia y pega directo del chat de campo<br>
+<strong>No necesitas ordenar las notas</strong> — el prompt está diseñado para recibirlas caóticamente y entregar un informe estructurado.
+</div>
+</details>
+
+<div class="tips"><strong>Entregables que obtendrás:</strong> <span class="entregable">Informe completo</span> <span class="entregable">5 Porqués</span> <span class="entregable">Plan correctivo</span> <span class="entregable">Código de hallazgos</span></div>
+</div>
+
+<!-- ═══════════════════════ PROCESO 5 ═══════════════════════ -->
+<div class="section">
+<div class="section-title"><span class="icon">📝</span> 5. Procedimientos de Trabajo Seguro (PTS/PETS)</div>
+<div class="ahorro">⏱️ Ahorro estimado: ~70% vs. redactar desde plantilla en blanco</div>
+<div class="where"><span class="badge badge-word">Word</span><span class="badge badge-copilot">Copilot Chat</span></div>
+
+<div class="flujo">
+<div class="step"><b>1.</b> Define la tarea y riesgos</div>
+<div class="arrow">→</div>
+<div class="step"><b>2.</b> Copia el prompt</div>
+<div class="arrow">→</div>
+<div class="step"><b>3.</b> Revisa, ajusta y firma</div>
+</div>
+
+<div class="prompt-box" id="p5"><button class="copy-btn" onclick="copyPrompt('p5')">📋 Copiar</button>Actúa como un profesional de SST con experiencia en redacción de Procedimientos de Trabajo Seguro según <span class="var">[NORMATIVA: ej. DS 44/2024 Chile, OSHA 29 CFR 1910, RCT Colombia, NOM-030 México]</span> y alineado con <span class="var">[ESTÁNDAR: ISO 45001:2018 / otra]</span>.
+
+OBJETIVO: Redactar un Procedimiento de Trabajo Seguro (PTS) para la tarea de <span class="var">[DESCRIBIR TAREA: ej. "cambio de filtros en línea de producción", "trabajo en caliente - soldadura", "carga/descarga de camiones tanque"]</span> en <span class="var">[NOMBRE EMPRESA]</span>.
+
+ESTRUCTURA OBLIGATORIA:
+1. OBJETO — propósito del procedimiento
+2. ALCANCE — dónde aplica, qué incluye y excluye
+3. REFERENCIAS NORMATIVAS — listar normas legales y técnicas aplicables
+4. DEFINICIONES — términos clave del procedimiento
+5. RESPONSABILIDADES (matriz RACI):
+   - Ejecutor (R) | Aprobador (A) | Consultado (C) | Informado (I)
+   - Roles: Operador, Supervisor SST, Jefe de Área, Gerente de Operaciones
+6. RECURSOS NECESARIOS — EPP, herramientas, permisos, certificaciones
+7. DESARROLLO — secuencia paso a paso:
+   ANTES de la tarea:
+   - Permisos requeridos (trabajo en caliente, en altura, espacio confinado, etc.)
+   - Verificaciones pre-operacionales
+   - EPP obligatorio
+   - Condiciones climáticas/ambientales
+   
+   DURANTE la tarea:
+   - Paso 1, 2, 3... (numerado, imperativo, un verbo por paso)
+   - Puntos de decisión: SI [condición] → ENTONCES [acción]
+   - Señales de alerta y parada
+   - Comunicación con el equipo
+   
+   DESPUÉS de la tarea:
+   - Verificación de cierre
+   - Limpieza y orden
+   - Reporte de novedades
+   - Guardado de herramientas/EPP
+   
+8. ANÁLISIS DE RIESGOS — tabla: Paso | Peligro | Riesgo | Control | Responsable
+9. PLAN DE EMERGENCIA — qué hacer si falla el control principal
+10. ANEXOS — formatos, diagramas de flujo, croquis
+
+ESTILO: Tercera persona, voz activa, pasos imperativos ("Verificar", "Colocar", "Asegurar"). Evitar ambigüedades. Máximo 4 páginas.</div>
+
+<details><summary>📌 Tareas comunes por industria</summary>
+<div class="tips">
+<strong>Ejemplos de PTS por sector:</strong><br>
+🏭 Industrial: bloqueo/etiquetado (LOTO), manejo de sustancias peligrosas, operación de calderas<br>
+⛏️ Minero: tronadura, trabajo en chimeneas, operación de equipos pesados<br>
+🏗️ Construcción: encofrado, izaje de cargas, trabajo en altura, excavación<br>
+🛢️ Petrolero: entrada a tanques, soldadura en áreas clasificadas, transferencia de combustibles<br>
+🌾 Agrícola: fumigación, operación de cosechadoras, manejo de agroquímicos<br>
+🏥 Salud: manejo de residuos biosanitarios, manipulación de citostáticos, esterilización
+</div>
+</details>
+
+<div class="tips"><strong>Entregables que obtendrás:</strong> <span class="entregable">PTS completo</span> <span class="entregable">Matriz RACI</span> <span class="entregable">Análisis de riesgos por paso</span> <span class="entregable">Plan de emergencia</span></div>
+</div>
+
+<!-- ═══════════════════════ PROCESO 6 ═══════════════════════ -->
+<div class="section">
+<div class="section-title"><span class="icon">📊</span> 6. Seguimiento de Programa Anual SST (PASST)</div>
+<div class="ahorro">⏱️ Ahorro estimado: ~80% vs. consolidar manualmente desde múltiples fuentes</div>
+<div class="where"><span class="badge badge-excel">Excel</span><span class="badge badge-power">Power BI</span><span class="badge badge-teams">Teams</span></div>
+
+<div class="flujo">
+<div class="step"><b>1.</b> Sube/exporta datos del PASST</div>
+<div class="arrow">→</div>
+<div class="step"><b>2.</b> Copia el prompt</div>
+<div class="arrow">→</div>
+<div class="step"><b>3.</b> Obtén dashboard y alertas</div>
+</div>
+
+<div class="prompt-box" id="p6"><button class="copy-btn" onclick="copyPrompt('p6')">📋 Copiar</button>Actúa como un gerente de SST analizando el seguimiento del Programa Anual de Seguridad y Salud en el Trabajo (PASST) de <span class="var">[NOMBRE EMPRESA]</span>, año <span class="var">[AÑO]</span>.
+
+DATOS DEL PASST (pegar o referenciar archivo):
+<span class="var">[PEGAR AQUÍ: cronograma, avances por actividad, fechas, responsables — puede ser copia de Excel, tabla de Word, o datos sueltos]</span>
+
+ANÁLISIS SOLICITADO:
+
+1. DASHBOARD EJECUTIVO
+   - % de cumplimiento global del PASST
+   - % por eje estratégico (capacitación, inspecciones, normativo, emergencias, salud ocupacional)
+   - Actividades cumplidas vs. programadas vs. atrasadas
+   - Mes con mayor/menor avance
+
+2. ANÁLISIS DE BRECHAS
+   - Actividades atrasadas con impacto en cumplimiento legal
+   - Responsables con más actividades pendientes
+   - Áreas críticas que ponen en riesgo la certificación/auditoría
+
+3. ALERTAS Y VENCIMIENTOS
+   - Actividades que vencen en los próximos <span class="var">[N] días</span>
+   - Permisos/certificaciones que expiran este trimestre
+   - Exámenes ocupacionales pendientes por trabajador
+
+4. PROYECCIÓN
+   - Si el ritmo actual se mantiene, ¿se cumplirá el PASST a fin de año?
+   - Qué actividades priorizar para recuperar el desfase
+   - Recomendación de reprogramación (si aplica)
+
+5. REPORTE PARA COMITÉ DE SST
+   - Resumen en 5 viñetas para presentación al comité
+   - 3 acciones inmediatas requeridas
+   - Indicadores clave para el mes siguiente
+
+FORMATO: Tablas con semáforo (🟢🔵🟡🔴). Incluir gráfico de avance mensual si es posible.</div>
+
+<details><summary>📌 Tip: datos desde cualquier fuente</summary>
+<div class="tips"><strong>Copilot acepta datos de:</strong><br>
+✅ Copia directa de Excel (seleccionar celdas → Ctrl+C → Ctrl+V en el chat)<br>
+✅ Tabla de Word<br>
+✅ Screenshot de un dashboard (Copilot analiza la imagen)<br>
+✅ Export CSV/PowerPoint<br>
+✅ Archivo adjunto de Excel en Copilot Chat<br>
+<strong>Si los datos son muy extensos</strong> (>500 filas), sube el archivo Excel directamente en vez de copiar/pegar.
+</div>
+</details>
+
+<div class="tips"><strong>Entregables que obtendrás:</strong> <span class="entregable">Dashboard ejecutivo</span> <span class="entregable">Análisis brechas</span> <span class="entregable">Alertas vencimiento</span> <span class="entregable">Reporte comité</span></div>
+</div>
+
+<!-- ═══════════════════════ PROCESO 7 ═══════════════════════ -->
+<div class="section">
+<div class="section-title"><span class="icon">🏗️</span> 7. Gestión de Contratistas — Homologación y Vencimientos</div>
+<div class="ahorro">⏱️ Ahorro estimado: ~80% vs. seguimiento manual en carpetas</div>
+<div class="where"><span class="badge badge-excel">Excel</span><span class="badge badge-outlook">Outlook</span><span class="badge badge-power">Power Automate</span></div>
+
+<div class="flujo">
+<div class="step"><b>1.</b> Sube lista de contratistas</div>
+<div class="arrow">→</div>
+<div class="step"><b>2.</b> Copia el prompt</div>
+<div class="arrow">→</div>
+<div class="step"><b>3.</b> Obtén matriz + correos automáticos</div>
+</div>
+
+<div class="prompt-box" id="p7"><button class="copy-btn" onclick="copyPrompt('p7')">📋 Copiar</button>Actúa como un administrador de contratos de SST con experiencia en gestión de contratistas según <span class="var">[NORMATIVA: ej. DS 44/2024 art. 10 bis (Chile), RCT art. 20-23 (Colombia), RLS art. 26-28 (Perú)]</span>.
+
+OBJETIVO: Generar un sistema de seguimiento de documentación de contratistas para <span class="var">[NOMBRE EMPRESA]</span>.
+
+DATOS DE CONTRATISTAS (pegar):
+<span class="var">[PEGAR: nombre empresa, RUT/ID, contacto, documentos que presentaron, fechas de vencimiento — puede ser desordenado]</span>
+
+ENTREGABLE 1 — MATRIZ DE HOMOLOGACIÓN:
+Tabla con columnas:
+N° | Empresa contratista | RUT/ID | Contacto | Área que presta servicios | Documento | Fecha presentación | Fecha vencimiento | Días hasta vencimiento | Estado (Vigente/Vencido/Próximo a vencer <30 días) | Observación
+
+Documentos típicos a verificar:
+- <span class="var">[AJUSTAR SEGÚN NORMATIVA]</span>
+  ☐ Constancia de inscripción en seguro de SST (ej. Mutualidad/SCTR)
+  ☐ Certificado de vigencia de seguro
+  ☐ Declaración de cumplimiento normativo
+  ☐ Evaluación de riesgos del servicio
+  ☐ Reglamento interno de SST
+  ☐ Certificado de capacitación del personal
+  ☐ Antecedentes de siniestralidad (índice de frecuencia/gravedad)
+  ☐ Autorizaciones especiales (si aplica)
+
+ENTREGABLE 2 — CORREO DE OBSERVACIÓN:
+Para cada contratista con documentos vencidos o faltantes, redactar correo profesional:
+
+Asunto: [NOMBRE EMPRESA] — Documentación SST pendiente/vencida — <span class="var">[NOMBRE CONTRATISTA]</span>
+
+Cuerpo:
+- Referencia normativa específica del documento faltante
+- Plazo para regularizar (ej. 5 días hábiles)
+- Consecuencia de no regularizar (restricción de acceso según política)
+- Tono profesional pero firme
+
+ENTREGABLE 3 — RESUMEN EJECUTIVO:
+- Total contratistas | Vigentes | Con observaciones | Vencidos
+- Riesgo contractual por documentación faltante
+- Próximos vencimientos del trimestre</div>
+
+<details><summary>📌 Automatización con Power Automate</summary>
+<div class="tips"><strong>Nivel avanzado — Automatizar alertas:</strong><br>
+1. Crea una lista en SharePoint con los datos de contratistas<br>
+2. En Power Automate, configura un flujo que:<br>
+   → Cada lunes a 8:00 AM revisa fechas de vencimiento<br>
+   → Si un documento vence en ≤30 días → envía correo automático al contratista<br>
+   → Si ya venció → notifica al supervisor del área y bloquea acceso<br>
+   → Actualiza un dashboard en Power BI<br>
+3. Copilot Studio puede responder consultas de contratistas tipo: "¿Está vigente mi seguro?" automáticamente
+</div>
+</details>
+
+<div class="tips"><strong>Entregables que obtendrás:</strong> <span class="entregable">Matriz homologación</span> <span class="entregable">Correos de observación</span> <span class="entregable">Resumen ejecutivo</span> <span class="entregable">Plan automatización</span></div>
+</div>
+
+<!-- ═══════════════════════ BONUS ═══════════════════════ -->
+<div class="section">
+<div class="section-title"><span class="icon">⚡</span> BONUS: Configuración Copilot Studio — Bot SST</div>
+<div class="where"><span class="badge badge-power">Copilot Studio</span><span class="badge badge-teams">Teams</span></div>
+
+<div class="prompt-box" id="p8"><button class="copy-btn" onclick="copyPrompt('p8')">📋 Copiar</button><!-- Guía para armar un Copilot personalizado SST en Copilot Studio -->
+
+PASO 1 — CREAR EL COPILOTO
+1. Ir a copilotstudio.microsoft.com
+2. + New copilot → Nombre: "Asistente SST <span class="var">[EMPRESA]</span>"
+3. Descripción: "Responde consultas sobre seguridad y salud en el trabajo, normativa aplicable, procedimientos y documentación de contratistas"
+
+PASO 2 — BASE DE CONOCIMIENTO (Knowledge)
+Subir a Knowledge sources:
+<span class="comment"># Documentos mínimos recomendados:</span>
+☐ Reglamento interno de SST
+☐ Matriz IPERC vigente
+☐ Normativa legal aplicable (PDFs oficiales)
+☐ Procedimientos de trabajo seguro
+☐ Protocolos de emergencia
+☐ Manual de contratistas
+☐ Planes de evacuación
+
+PASO 3 — TOPICS (Flujos conversacionales)
+Crear estos topics:
+
+Topic 1: "Consulta normativa"
+→ Trigger: "¿Qué dice la norma sobre...?" / "Es obligatorio...?" / "Qué normativa aplica para...?"
+→ Acción: Busca en Knowledge y responde con referencia exacta (artículo/número)
+
+Topic 2: "Reportar hallazgo"
+→ Trigger: "Quiero reportar..." / "Encontré un peligro..." / "Hay un riesgo en..."
+→ Acción: Formulario → Ubicación | Descripción | Foto | Gravedad → Guarda en SharePoint List → Notifica al supervisor
+
+Topic 3: "Verificar contratista"
+→ Trigger: "¿Está vigente...?" / "Documentos de..." / "Contratista..."
+→ Acción: Consulta SharePoint List → Responde estado documentación + vencimientos
+
+Topic 4: "Procedimiento de trabajo"
+→ Trigger: "Cómo se hace..." / "Procedimiento para..." / "Qué pasos seguir para..."
+→ Acción: Busca PTS en Knowledge → Resume pasos clave + EPP requerido
+
+Topic 5: "Emergencia"
+→ Trigger: "Emergencia" / "Accidente" / "Incendio" / "Derrame"
+→ Acción: Muestra procedimiento de emergencia + números de contacto + pasos inmediatos
+
+PASO 4 — PUBLICAR
+1. Publicar en Microsoft Teams como bot del equipo
+2. Agregar al canal de SST
+3. Capacitar al equipo en los comandos disponibles
+
+PASO 5 — MEJORAR ITERATIVAMENTE
+- Revisar preguntas que el bot no pudo responder → agregar a Knowledge
+- Ajustar topics según consultas frecuentes
+- Conectar Power Automate para acciones (no solo respuestas)</div>
+
+<div class="tips"><strong>Entregables que obtendrás:</strong> <span class="entregable">Bot SST funcional</span> <span class="entregable">5 topics configurados</span> <span class="entregable">Publicación en Teams</span> <span class="entregable">Plan de mejora continua</span></div>
+</div>
+
+<div class="footer">
+<p>🤖 Prompts IA × SST — Guía Universal para Microsoft Copilot</p>
+<p>Adaptable a cualquier industria · Normativa · Organización</p>
+<p style="margin-top:8px">Reemplaza las <span style="color:var(--orange)">[variables]</span> con tu contexto → Copia → Pega → Itera</p>
+</div>
+
+<script>
+function copyPrompt(id){
+  const el=document.getElementById(id);
+  const btn=el.querySelector('.copy-btn');
+  let text=el.innerText.replace('📋 Copiar','').trim();
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='✅ Copiado!';
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='📋 Copiar';btn.classList.remove('copied');},2000);
+  });
+}
+</script>
+</body>
+</html>
